@@ -2,7 +2,9 @@
 
 An iOS app that reads a heartbeat through the phone's rear camera and flash, built for parents who want to know their baby is okay while someone else is holding them.
 
-A fingertip resting on the lens with the flash on makes the skin flush and fade with every pulse. The camera watches that tiny change in brightness, and the app counts the beats. No extra hardware, just the phone.
+A fingertip resting on the lens with the flash on makes the skin flush and fade with every pulse. The camera watches that tiny change in brightness, and the app counts the beats. No extra hardware, just the phone. The iPhone camera flash measures your heartbeat through your thumb using photoplethysmography (PPG), a technique that detects changes in blood volume just beneath your skin.
+
+All the visuals were generated using Lovart! Watch our Loom video for more.
 
 ## Two apps in one
 

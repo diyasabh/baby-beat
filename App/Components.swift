@@ -114,8 +114,7 @@ struct BeatHeroCard: View {
                 let worrying = reading.mood.isWorrying
                 VStack(spacing: 10) {
                     PulsingHeart(bpm: reading.bpm, size: 108,
-                                 tint: worrying ? Theme.alert : Theme.heart,
-                                 tintDeep: worrying ? Theme.alertDeep : Theme.heartDeep)
+                                 tint: worrying ? Theme.alert : nil)
                     HStack(alignment: .firstTextBaseline, spacing: 6) {
                         Text("\(reading.bpm)")
                             .font(Theme.number(58))

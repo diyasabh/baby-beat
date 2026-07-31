@@ -74,8 +74,8 @@ struct BeatWidgetView: View {
     private var asking: BeatRequest? { worrying ? nil : entry.waitingAsk }
     private var ink: Color { worrying ? .white : Theme.ink }
     private var inkSoft: Color { worrying ? .white.opacity(0.75) : Theme.inkSoft }
-    private var heartTint: Color { worrying ? .white : Theme.heart }
-    private var heartTintDeep: Color { worrying ? Color(white: 0.88) : Theme.heartDeep }
+    /// nil keeps the drawing's own crayon pink; the alert sky needs it white.
+    private var heartTint: Color? { worrying ? .white : nil }
 
     /// Small line above the number: where it came from, or where it went.
     private var captionLine: String {
@@ -130,7 +130,7 @@ struct BeatWidgetView: View {
         VStack(spacing: 6) {
             PulsingHeart(bpm: entry.reading?.bpm ?? 120, size: 64,
                          animated: false, phase: entry.pulsePhase,
-                         tint: heartTint, tintDeep: heartTintDeep)
+                         tint: heartTint)
             if let reading = entry.reading {
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
                     Text("\(reading.bpm)")
@@ -188,7 +188,7 @@ struct BeatWidgetView: View {
         HStack(spacing: 16) {
             PulsingHeart(bpm: entry.reading?.bpm ?? 120, size: 84,
                          animated: false, phase: entry.pulsePhase,
-                         tint: heartTint, tintDeep: heartTintDeep)
+                         tint: heartTint)
             VStack(alignment: .leading, spacing: 5) {
                 Text(captionLine)
                     .font(Theme.meta(12))

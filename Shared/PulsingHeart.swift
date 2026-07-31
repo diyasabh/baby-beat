@@ -1,57 +1,63 @@
 import SwiftUI
 
-/// The one heart of the app. A pink heart with soft echo rings that swell
-/// outward like a pulse. In the app it beats live at the real bpm; in the
-/// widget it holds a gentle phase and breathes between timeline entries.
-/// This is the shared signature. Do not invent a second heart.
+/// The one heart of the app: the hand-drawn crayon heart, beating at the real
+/// bpm. Not a sine throb — a lub-dub, so the motion reads as a heartbeat
+/// rather than a pulsing dot. In the widget it holds a pose and breathes
+/// between timeline entries. This is the shared signature; never add a second
+/// heart.
 struct PulsingHeart: View {
     var bpm: Int
     var size: CGFloat = 96
     /// Live animation (app only). Widgets pass false and drive `phase`.
     var animated: Bool = true
-    /// 0 or 1, the resting and swollen pose used when not animated.
+    /// The resting and swollen pose used when not animated.
     var phase: Bool = false
-    /// The heart's color pair. Alert states pass alert reds; on the alert
-    /// sky the heart goes cloud white instead.
-    var tint: Color = Theme.heart
-    var tintDeep: Color = Theme.heartDeep
+    /// Tint the drawing instead of letting it keep its own crayon pink.
+    /// Alert states pass red; the widget's alert sky passes white.
+    var tint: Color?
 
-    @State private var beating = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var scaleSmall: CGFloat { 1.0 }
-    private var scaleBig: CGFloat { 1.09 }
+    /// One full cycle, so the beat literally runs at the measured rate.
+    private var period: Double { Theme.beatPeriod(bpm: bpm) }
 
     var body: some View {
-        ZStack {
-            echoRing(scale: 1.35, opacity: 0.16)
-            echoRing(scale: 1.7, opacity: 0.08)
-            Image(systemName: "heart.fill")
-                .font(.system(size: size * 0.62))
-                .foregroundStyle(
-                    LinearGradient(colors: [tint, tintDeep],
-                                   startPoint: .top, endPoint: .bottom)
-                )
-                .shadow(color: tintDeep.opacity(0.35), radius: size * 0.12, y: size * 0.05)
-                .scaleEffect(currentScale)
-        }
-        .frame(width: size, height: size)
-        .onAppear {
-            guard animated else { return }
-            withAnimation(Theme.beat(bpm: bpm).repeatForever(autoreverses: true)) {
-                beating = true
+        Group {
+            if animated && !reduceMotion {
+                KeyframeAnimator(initialValue: 1.0, repeating: true) { scale in
+                    heart.scaleEffect(scale)
+                } keyframes: { _ in
+                    // lub: the big squeeze
+                    CubicKeyframe(1.085, duration: period * 0.12)
+                    // ...falls back most of the way
+                    CubicKeyframe(1.015, duration: period * 0.13)
+                    // dub: the smaller second beat
+                    CubicKeyframe(1.055, duration: period * 0.10)
+                    // ...settles
+                    CubicKeyframe(1.0, duration: period * 0.20)
+                    // and rests until the next one
+                    LinearKeyframe(1.0, duration: period * 0.45)
+                }
+            } else {
+                heart.scaleEffect(phase ? 1.06 : 1.0)
             }
         }
+        .frame(width: size, height: size)
     }
 
-    private var currentScale: CGFloat {
-        if animated { return beating ? scaleBig : scaleSmall }
-        return phase ? scaleBig : scaleSmall
-    }
-
-    private func echoRing(scale: CGFloat, opacity: Double) -> some View {
-        Circle()
-            .fill(tint.opacity(opacity))
-            .frame(width: size * 0.62, height: size * 0.62)
-            .scaleEffect(scale * (currentScale - 1) * 2 + scale)
+    @ViewBuilder
+    private var heart: some View {
+        if let tint {
+            // Template rendering keeps every crayon stroke, just in one color.
+            Image("heart-drawn")
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(tint)
+        } else {
+            Image("heart-drawn")
+                .resizable()
+                .scaledToFit()
+        }
     }
 }

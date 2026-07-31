@@ -36,9 +36,10 @@ enum Theme {
     /// The house easing. Calm rise, no bounce.
     static let ease = Animation.timingCurve(0.16, 1, 0.3, 1, duration: 0.6)
 
-    /// One beat of the shared heart pulse for a given bpm.
-    static func beat(bpm: Int) -> Animation {
-        .easeInOut(duration: max(60.0 / Double(max(bpm, 30)), 0.3) / 2)
+    /// One full heart cycle in seconds, so the drawn heart beats at the rate
+    /// actually being shown. Clamped so a wild reading can't blur into a hum.
+    static func beatPeriod(bpm: Int) -> Double {
+        min(max(60.0 / Double(max(bpm, 30)), 0.3), 2.0)
     }
 
     // MARK: Shape

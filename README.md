@@ -65,4 +65,4 @@ Made for peace of mind, not diagnosis. If anything ever feels off, call a pediat
 
 ## Credits
 
-Designed and built by Diya Sabharwal and Selena Yang.
+Designed and built by [Diya Sabharwal](https://diyasabh.com) and [Selena Yang](https://selenayang.art).

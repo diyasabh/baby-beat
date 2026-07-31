@@ -49,8 +49,12 @@
   .switch .k{font-size:11px;color:var(--faint);font-weight:600}
 
   .side-foot{margin-top:auto;padding-top:20px;font-size:12px;line-height:1.5;color:var(--muted)}
-  .side-foot a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--hair)}
-  .side-foot a:hover{border-color:var(--land)}
+  .side-foot .by{display:block;margin-bottom:5px}
+  /* both names get the same weight, size and treatment: equal billing */
+  .side-foot .who{display:block;font-size:13.5px;font-weight:600;color:var(--ink);
+    text-decoration:none;border-bottom:1px solid var(--hair);width:fit-content;margin-bottom:3px;
+    transition:border-color .18s var(--ease),color .18s}
+  .side-foot .who:hover{border-color:var(--land);color:var(--land-deep)}
 
   /* stage */
   .stage{flex:1;position:relative;height:100%;min-width:0;display:flex;flex-direction:column;
@@ -119,7 +123,9 @@
 
     <div class="side-foot">
       An iOS app that reads a heartbeat<br>through the camera and flash.<br><br>
-      Designed &amp; built by<br><a href="https://diyasabh.com" target="_blank" rel="noopener">Diya Sabharwal</a><br>and Selena Yang
+      <span class="by">Designed &amp; built by</span>
+      <a class="who" href="https://diyasabh.com" target="_blank" rel="noopener">Diya Sabharwal</a>
+      <a class="who" href="https://selenayang.art" target="_blank" rel="noopener">Selena Yang</a>
     </div>
   </aside>
 

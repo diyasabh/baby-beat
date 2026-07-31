@@ -1,8 +1,10 @@
 import SwiftUI
+import WidgetKit
 
 @main
 struct BabyBeatApp: App {
     @StateObject private var model = BeatModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         BeatNotifications.shared.configure()
@@ -12,6 +14,13 @@ struct BabyBeatApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(model)
+                .onChange(of: scenePhase) { _, phase in
+                    // The store can change outside this process, so re-read on
+                    // foreground and let the widget catch up with it.
+                    guard phase == .active else { return }
+                    model.refreshFromStore()
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
                 .onOpenURL { url in
                     guard url.scheme == "babybeat" else { return }
                     // Only a caregiver can answer with a beat; tapping the
@@ -49,11 +58,29 @@ final class BeatModel: ObservableObject {
     }
 
     init() {
+        #if DEBUG
+        // Presentation capture: seed before anything reads the store.
+        DemoState.fromLaunchArguments()?.write()
+        #endif
         remindersOn = BeatStore.defaults.bool(forKey: "beat.reminders")
         profile = BeatStore.profile
+        // The stored-property defaults ran before this point, so re-read them
+        // in case a demo state was just written.
+        readings = BeatStore.load()
+        requests = BeatStore.requests
+        providers = BeatStore.providers
     }
 
     var role: Role? { profile?.role }
+
+    /// Re-read the shared store. The widget, the other role, and anything else
+    /// touching the App Group can change it while this screen is away.
+    func refreshFromStore() {
+        readings = BeatStore.load()
+        requests = BeatStore.requests
+        providers = BeatStore.providers
+        if BeatStore.profile != profile { profile = BeatStore.profile }
+    }
 
     // MARK: Onboarding
 

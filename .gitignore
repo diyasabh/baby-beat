@@ -17,5 +17,8 @@ DerivedData/
 .build/
 Packages/
 
-## Presentation captures
-presentation/shots/
+## Presentation captures are committed on purpose — they are the content of
+## presentation/index.html, which is useless without them. capture.sh + optimize.py
+## regenerate them from the simulator; optimize.py keeps them ~150 KB each.
+presentation/shots/*.png
+presentation/shots/_*

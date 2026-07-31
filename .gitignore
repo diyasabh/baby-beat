@@ -1,0 +1,21 @@
+## macOS
+.DS_Store
+
+## Xcode project — generated from project.yml by XcodeGen, never edited by hand.
+## Run `xcodegen generate` after cloning.
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+
+## Build output
+build/
+DerivedData/
+
+## Swift Package Manager
+.swiftpm/
+.build/
+Packages/
+
+## Presentation captures
+presentation/shots/

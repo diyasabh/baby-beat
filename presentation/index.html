@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Baby Beat — Prototype flows by Diya Sabharwal</title>
+<title>Baby Beat, prototype flows by Diya Sabharwal and Selena Yang</title>
 <style>
   :root{
     --ink:#141210; --paper:#EAE8E2; --panel:#F1EFE9; --card:#FBFAF6;
@@ -119,7 +119,7 @@
 
     <div class="side-foot">
       An iOS app that reads a heartbeat<br>through the camera and flash.<br><br>
-      Designed &amp; built by<br><a href="https://diyasabh.com" target="_blank" rel="noopener">Diya Sabharwal</a>
+      Designed &amp; built by<br><a href="https://diyasabh.com" target="_blank" rel="noopener">Diya Sabharwal</a><br>and Selena Yang
     </div>
   </aside>
 
@@ -128,7 +128,7 @@
     <div class="legend">captured from the iOS simulator &nbsp;·&nbsp; <b>← →</b> to step</div>
     <div class="phone" id="phone"></div>
     <div class="screenbar" id="screenbar"></div>
-    <div class="narrow">Design notes need a wider window — they sit in the margins beside the phone.</div>
+    <div class="narrow">Design notes need a wider window. They sit in the margins beside the phone.</div>
   </main>
 
 <script src="notes.js"></script>
@@ -143,7 +143,7 @@ const FLOWS = [
     { f:'fresh.jpg', label:'who is holding the phone',
       cap:'Onboarding · the fork',
       notes:[
-        {a:[.5,.20],side:'l',t:'the first question is not ‘sign up’. it is <b>who are you to this baby</b> — because the answer changes which half of the app you get'},
+        {a:[.5,.20],side:'l',t:'the first question is not ‘sign up’. it is <b>who are you to this baby</b>, because the answer changes which half of the app you get'},
         {a:[.5,.42],side:'r',w:250,t:'two roles, two whole apps. a parent literally <b>cannot reach the camera</b>, so nobody takes a reading they were not asked for'},
         {a:[.5,.72],side:'r',t:'‘you can switch views any time’ sits right under the choice. <b>a fork this big needs a visible exit</b>'}
       ]},
@@ -157,13 +157,13 @@ const FLOWS = [
     { f:'onboard_caregiver.jpg', label:'caregiver setup',
       cap:'Onboarding · caregiver',
       notes:[
-        {a:[.5,.30],side:'l',t:'the caregiver names <b>themselves and their room</b> — that is what shows up on the parent’s screen as ‘by miss rosie at little clouds’'},
+        {a:[.5,.30],side:'l',t:'the caregiver names <b>themselves and their room</b>. that is what shows up on the parent’s screen as ‘by miss rosie at little clouds’'},
         {a:[.5,.72],side:'r',t:'same card, opposite promise: <b>you will be the one counting</b>, and you will see when a parent asks'}
       ]}
   ]
 },
 {
-  t:'Parent — everyday', s:'watching, not doing',
+  t:'Parent, everyday', s:'watching, not doing',
   screens:[
     { f:'parent_calm.jpg', label:'a calm beat',
       cap:'Parent · calm',
@@ -180,33 +180,33 @@ const FLOWS = [
         {a:[.5,.115],side:'l',w:246,t:'each caregiver you have added, each with their own ask button. <b>you ask a person, not the app</b>'},
         {a:[.5,.33],side:'r',w:250,t:'the mood words are <b>explained in plain language before red ever appears</b>, so an alert is never the first time you learn what the colours mean'},
         {a:[.5,.50],side:'l',w:252,t:'the quiet policy, stated out loud: <b>a good beat never buzzes your pocket</b>. it lands on the widget, there whenever you want it'},
-        {a:[.5,.70],side:'r',w:246,t:'the only notification setting is about <b>silence, not noise</b> — nudge me if a whole stretch of the day goes by with no check at all'}
+        {a:[.5,.70],side:'r',w:246,t:'the only notification setting is about <b>silence, not noise</b>. nudge me if a whole stretch of the day goes by with no check at all'}
       ]},
     { f:'parent_waiting.jpg', label:'after asking',
       cap:'Parent · waiting',
       notes:[
         {a:[.5,.115],side:'l',w:248,t:'the ask gets its own banner with a live timer. <b>the anxious state deserves its own screen</b>, not a toast that vanishes'},
-        {a:[.5,.87],side:'r',w:246,t:'the button stops being a button. <b>you cannot nag</b> — one ask is out, and the app says so instead of letting you spam a caregiver holding a baby'}
+        {a:[.5,.87],side:'r',w:246,t:'the button stops being a button. <b>you cannot nag</b>. one ask is out, and the app says so instead of letting you spam a caregiver holding a baby'}
       ]}
   ]
 },
 {
-  t:'Parent — worrying', s:'when the number is wrong',
+  t:'Parent, worrying', s:'when the number is wrong',
   screens:[
     { f:'parent_alert.jpg', label:'195 bpm',
       cap:'Parent · alert', alert:true,
       notes:[
         {a:[.5,.145],side:'l',w:250,t:'the same drawn heart, <b>template-tinted red</b>. every crayon stroke survives because the tint uses the artwork’s alpha'},
-        {a:[.5,.25],side:'l',t:'the number turns red too. <b>colour is never the only signal</b> — the words change with it'},
+        {a:[.5,.25],side:'l',t:'the number turns red too. <b>colour is never the only signal</b>. the words change with it'},
         {a:[.5,.325],side:'r',w:248,t:'the reassurance line becomes <b>an instruction</b>: ‘please check on baby now’. the sentence does the work, not the colour'},
         {a:[.36,.735],side:'r',w:244,t:'the timeline dot and the ‘racing’ chip go red at the same instant. <b>one mood, applied everywhere</b>, so nothing contradicts anything'}
       ]},
     { f:'parent_alert__home.jpg', label:'on the home screen',
       cap:'Parent · alert widget', alert:true,
       notes:[
-        {a:[.30,.17],side:'l',w:250,t:'the widget flips its whole sky to red. <b>the alert is legible without unlocking</b> — that is the entire point of putting it here'},
+        {a:[.30,.17],side:'l',w:250,t:'the widget flips its whole sky to red. <b>the alert is legible without unlocking</b>. that is the entire point of putting it here'},
         {a:[.30,.24],side:'r',t:'the heart goes white on red, still hand-drawn. <b>same primitive, different weather</b>'},
-        {a:[.28,.285],side:'r',w:248,t:'a calm beat <b>never buzzes a pocket</b> — it just lands here. only a worrying one earns a notification. ‘everything is fine’ is not worth interrupting a day for'}
+        {a:[.28,.285],side:'r',w:248,t:'a calm beat <b>never buzzes a pocket</b>. it just lands here. only a worrying one earns a notification. ‘everything is fine’ is not worth interrupting a day for'}
       ]}
   ]
 },
@@ -217,32 +217,32 @@ const FLOWS = [
       cap:'Caregiver · a parent is waiting',
       notes:[
         {a:[.5,.13],side:'l',w:250,t:'the ask is the <b>first thing on the screen</b>, above the last beat. it is the reason a caregiver opens this app at all'},
-        {a:[.5,.175],side:'r',t:'butter yellow, never red. <b>a request is a nudge, not an emergency</b> — the palette has to keep those apart'},
-        {a:[.5,.235],side:'r',w:246,t:'‘counting a beat answers everyone waiting’ — <b>one reading clears the whole queue</b>, so nobody counts twice for two parents'},
+        {a:[.5,.175],side:'r',t:'butter yellow, never red. <b>a request is a nudge, not an emergency</b>, and the palette has to keep those apart'},
+        {a:[.5,.235],side:'r',w:246,t:'‘counting a beat answers everyone waiting’. <b>one reading clears the whole queue</b>, so nobody counts twice for two parents'},
         {a:[.5,.88],side:'r',t:'the button names who it is for. <b>‘take a beat for mom’</b> beats a generic capture verb'}
       ]},
     { f:'measure_intro.jpg', label:'how to take one',
       cap:'Caregiver · capture',
       notes:[
-        {a:[.5,.42],side:'l',w:252,t:'three plain steps, no diagram. the flash is called <b>‘a tiny nightlight’</b> — the phone is about to glow in a dark nap room and that should not alarm anyone'},
+        {a:[.5,.42],side:'l',w:252,t:'three plain steps, no diagram. the flash is called <b>‘a tiny nightlight’</b>, because the phone is about to glow in a dark nap room and that should not alarm anyone'},
         {a:[.5,.60],side:'r',w:244,t:'fifteen seconds is stated up front. <b>holding a baby still is the hard part</b>, so the cost is named before you start'}
       ]},
     { f:'measure_reading.jpg', label:'counting',
       cap:'Caregiver · counting',
       notes:[
-        {a:[.5,.30],side:'l',t:'the live wave is <b>the actual signal</b> off the camera, not decoration — you can see when a finger slips'},
+        {a:[.5,.30],side:'l',t:'the live wave is <b>the actual signal</b> off the camera, not decoration. you can see when a finger slips'},
         {a:[.5,.52],side:'r',w:246,t:'the count updates as it settles, so <b>the wait is never a blank spinner</b>. and the copy says ‘hold soft and still’, spoken to someone holding a baby'}
       ]},
     { f:'measure_result.jpg', label:'sending it home',
       cap:'Caregiver · sending',
       notes:[
-        {a:[.5,.47],side:'l',w:248,t:'the caregiver sees the mood <b>before</b> they send. no silent upload — they know what they are handing over'},
+        {a:[.5,.47],side:'l',w:248,t:'the caregiver sees the mood <b>before</b> they send. no silent upload. they know what they are handing over'},
         {a:[.5,.60],side:'r',w:244,t:'the button names the person waiting: <b>‘send it to mom’</b>. and ‘try again’ sits right under it, because a wiggly baby reads high and honest retakes matter'}
       ]},
     { f:'caregiver_alert_sent.jpg', label:'after a worrying beat',
       cap:'Caregiver · alert sent', alert:true,
       notes:[
-        {a:[.5,.145],side:'l',w:250,t:'the caregiver sees the same red the parent does. <b>both sides read one truth</b> — no ‘it looked fine on my end’'},
+        {a:[.5,.145],side:'l',w:250,t:'the caregiver sees the same red the parent does. <b>both sides read one truth</b>, so nobody says ‘it looked fine on my end’'},
         {a:[.5,.46],side:'r',w:246,t:'the caregiver’s framing is what they <b>sent</b>, not what arrived. same data, same components, different sentence'}
       ]}
   ]
@@ -255,12 +255,12 @@ const FLOWS = [
       notes:[
         {a:[.5,.30],side:'l',t:'who you are, who the baby is, and where. <b>three facts, no settings list</b>'},
         {a:[.5,.52],side:'r',w:248,t:'a parent manages <b>who they are allowed to ask</b> here. adding a caregiver is the only thing that unlocks the ask button'},
-        {a:[.5,.80],side:'r',w:250,t:'there is no backend — both roles share one App Group store. that is a prototype limit, but it makes the whole loop <b>demoable on a single phone</b>'}
+        {a:[.5,.80],side:'r',w:250,t:'there is no backend. both roles share one App Group store. that is a prototype limit, but it makes the whole loop <b>demoable on a single phone</b>'}
       ]},
     { f:'caregiver_asked__home.jpg', label:'the caregiver’s widget',
       cap:'Widget · asking',
       notes:[
-        {a:[.30,.17],side:'l',w:250,t:'the widget knows which role owns the phone. a caregiver sees <b>the ask</b>, a parent sees the beat — same widget, same code'},
+        {a:[.30,.17],side:'l',w:250,t:'the widget knows which role owns the phone. a caregiver sees <b>the ask</b>, a parent sees the beat. same widget, same code'},
         {a:[.30,.235],side:'r',w:244,t:'a worrying beat <b>always outranks an ask</b>, so red can never hide behind a yellow request'}
       ]}
   ]

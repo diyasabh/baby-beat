@@ -18,6 +18,9 @@ final class PulseCameraReader: NSObject, ObservableObject {
     /// several. Only one lens is ever sampled (the main wide camera); this
     /// rises as a sliding fingertip gets closer to it.
     @Published var warmth: Double = 0
+    /// Increments the moment each beat lands, so the UI can tap and pop in
+    /// time with the pulse.
+    @Published var beatTick = 0
 
     private let session = AVCaptureSession()
     private let queue = DispatchQueue(label: "babybeat.camera")
@@ -112,6 +115,7 @@ final class PulseCameraReader: NSObject, ObservableObject {
     private var fingerSince: Double?
     private var exposureLocked = false
     private var warmthSmoothed: Double = 0
+    private var lastBeatAt: Double = -1
 
     private func process(brightness: Double, redRatio: Double, at time: Double) {
         // Finger present when the lens is mostly red and lit by the torch.
@@ -150,6 +154,18 @@ final class PulseCameraReader: NSObject, ObservableObject {
         }
 
         let normalized = normalize(brightnessWindow)
+
+        // A fresh peak at the tail of the signal is a beat happening right
+        // now. Same shape and refractory rules as the bpm estimator.
+        if fingerOn, normalized.count >= 3 {
+            let i = normalized.count - 2
+            if normalized[i] > 0.6, normalized[i] >= normalized[i - 1], normalized[i] > normalized[i + 1],
+               timestamps[i] - lastBeatAt >= 0.28 {
+                lastBeatAt = timestamps[i]
+                DispatchQueue.main.async { self.beatTick += 1 }
+            }
+        }
+
         let span = (timestamps.last ?? time) - (timestamps.first ?? time)
         let estimate = fingerOn && span >= windowSeconds * 0.6
             ? estimateBPM(normalized, timestamps: timestamps) : nil

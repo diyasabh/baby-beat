@@ -10,6 +10,7 @@ struct MeasureView: View {
 
     private enum Stage { case intro, reading, done(Int) }
     @State private var stage: Stage = .intro
+    @State private var beatPop = false
 
     var body: some View {
         ZStack {
@@ -87,6 +88,7 @@ struct MeasureView: View {
             VStack(spacing: 18) {
                 if reader.isFingerDetected {
                     PulsingHeart(bpm: reader.bpm ?? 118, size: 104)
+                        .scaleEffect(beatPop ? 1.07 : 1)
                 } else {
                     LensGuide()
                 }
@@ -117,6 +119,15 @@ struct MeasureView: View {
             }
             .frame(maxWidth: .infinity)
             .animation(Theme.ease, value: reader.isFingerDetected)
+        }
+        // Each landed beat: a soft tap in the hand and a pop of the heart,
+        // so a good signal is something the parent can feel.
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.8), trigger: reader.beatTick)
+        .onChange(of: reader.beatTick) { _, _ in
+            var still = Transaction()
+            still.disablesAnimations = true
+            withTransaction(still) { beatPop = true }
+            withAnimation(.spring(response: 0.24, dampingFraction: 0.5)) { beatPop = false }
         }
     }
 

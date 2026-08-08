@@ -103,8 +103,8 @@ struct ParentDashboard: View {
     private var statsRow: some View {
         HStack(spacing: 12) {
             StatChip(label: "checks today", value: "\(model.todayCount)")
-            StatChip(label: "usual beat", value: model.averageBPM.map { "\($0)" } ?? "~")
-            StatChip(label: "feeling", value: model.latest?.mood.word ?? "~")
+            StatChip(label: "last check", value: shortAgo(model.latest?.date))
+            StatChip(label: "from", value: model.latest?.place ?? "~")
         }
     }
 
@@ -153,16 +153,11 @@ struct ParentDashboard: View {
     private var infoCard: some View {
         CloudCard {
             VStack(alignment: .leading, spacing: 12) {
-                BrandLabel(title: "what's a happy beat", icon: .spark)
-                InfoRow(word: "sleepy", text: "fast asleep, around 90 to 120", color: BeatMood.sleepy.color)
-                InfoRow(word: "cozy", text: "calm and cuddly, around 100 to 160", color: BeatMood.cozy.color)
-                InfoRow(word: "bouncy", text: "wiggly and playing, up to about 180", color: BeatMood.bouncy.color)
-                InfoRow(word: "worrying", text: "under 75 or over 185 turns everything red so you can check right away", color: Theme.alert)
-                Text("a good beat never buzzes your pocket. it just lands on your widget, there whenever you want to look. only a worrying one sends a note.")
-                    .font(Theme.meta(12))
-                    .foregroundStyle(Theme.inkSoft)
-                    .padding(.top, 2)
-                Text("made for sweet peace of mind, not a medical device. if anything ever feels off, call your pediatrician.")
+                BrandLabel(title: "what a beat is here", icon: .spark)
+                InfoRow(word: "felt", text: "a fingertip rests on the camera and the phone feels the rhythm of little beats", color: Theme.heart)
+                InfoRow(word: "shared", text: "each check flies home to you the moment it is taken", color: Theme.butter)
+                InfoRow(word: "honest", text: "no numbers and no scores for now — a beat is a hello, not a reading", color: Color(red: 0.55, green: 0.66, blue: 0.93))
+                Text("baby beat is a way to feel close, not a medical device. it never measures or judges baby's health. if anything ever feels off, trust yourself and call your pediatrician.")
                     .font(Theme.meta(12))
                     .foregroundStyle(Theme.inkSoft)
                     .padding(.top, 2)
@@ -175,7 +170,7 @@ struct ParentDashboard: View {
             Toggle(isOn: $model.remindersOn) {
                 VStack(alignment: .leading, spacing: 4) {
                     BrandLabel(title: "nudge me if it goes quiet", icon: .bell)
-                    Text("a worrying beat always sends a note. turn this on and we'll also whisper if a whole stretch of the day goes by with no check at all.")
+                    Text("every check sends a soft note when it lands. turn this on and we'll also whisper if a whole stretch of the day goes by with no check at all.")
                         .font(Theme.meta(13))
                         .foregroundStyle(Theme.inkSoft)
                 }
@@ -191,18 +186,18 @@ struct BeatRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Circle()
-                .fill(reading.mood.color)
-                .frame(width: 8, height: 8)
+            Image(systemName: "heart.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(Theme.heart)
             Text(reading.date, format: .dateTime.hour().minute())
                 .font(Theme.meta(13))
                 .foregroundStyle(Theme.inkSoft)
                 .frame(width: 70, alignment: .leading)
-            Text("\(reading.bpm) bpm")
+            Text("a little beat")
                 .font(Theme.body(14))
                 .foregroundStyle(Theme.ink)
             Spacer()
-            Text(reading.mood.word)
+            Text("by \(reading.sender)")
                 .font(Theme.meta(13))
                 .foregroundStyle(Theme.inkSoft)
         }

@@ -80,8 +80,8 @@ struct CaregiverDashboard: View {
     private var statsRow: some View {
         HStack(spacing: 12) {
             StatChip(label: "sent today", value: "\(model.todayCount)")
-            StatChip(label: "usual beat", value: model.averageBPM.map { "\($0)" } ?? "~")
-            StatChip(label: "feeling", value: model.latest?.mood.word ?? "~")
+            StatChip(label: "last sent", value: shortAgo(model.latest?.date))
+            StatChip(label: "counting for", value: babyName)
         }
     }
 
@@ -103,10 +103,9 @@ struct CaregiverDashboard: View {
             VStack(alignment: .leading, spacing: 12) {
                 BrandLabel(title: "taking a good beat", icon: .spark)
                 InfoRow(word: "still", text: "rest their fingertip flat over the camera and flash", color: Theme.heart)
-                InfoRow(word: "calm", text: "wait until they settle, a wiggly beat reads high", color: BeatMood.bouncy.color)
-                InfoRow(word: "fifteen", text: "hold about fifteen seconds for a steady count", color: BeatMood.sleepy.color)
-                InfoRow(word: "red", text: "under 75 or over 185 sends an urgent note home right away", color: Theme.alert)
-                Text("made for sweet peace of mind, not a medical device. if anything ever feels off, tell the parent and call for help.")
+                InfoRow(word: "calm", text: "wait until they settle so the rhythm comes through clean", color: Theme.butter)
+                InfoRow(word: "fifteen", text: "hold about fifteen seconds so the beats settle in", color: Color(red: 0.55, green: 0.66, blue: 0.93))
+                Text("a beat is a hello, never a measurement or a verdict. if anything ever feels off, tell the parent and call for help.")
                     .font(Theme.meta(12))
                     .foregroundStyle(Theme.inkSoft)
                     .padding(.top, 2)

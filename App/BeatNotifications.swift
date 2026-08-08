@@ -1,9 +1,8 @@
 import UserNotifications
 
-/// Notes from the app, kept deliberately rare. A calm beat never interrupts:
-/// it lands on the widget, where the parent can glance at it whenever they
-/// want. Only a worrying beat is allowed to buzz a pocket. The optional
-/// nudge covers the other worry, a day that has gone quiet.
+/// Notes from the app. Each check sends one soft hello with no numbers and
+/// no verdicts, and the optional nudge covers a day that has gone quiet.
+/// Nothing here ever interprets baby's health.
 final class BeatNotifications: NSObject, UNUserNotificationCenterDelegate {
     static let shared = BeatNotifications()
 
@@ -17,16 +16,12 @@ final class BeatNotifications: NSObject, UNUserNotificationCenterDelegate {
         center.requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
     }
 
-    /// Called after every saved check, but only a worrying one actually
-    /// sends. A good beat is not news, so it stays on the widget and the
-    /// parent's day is never interrupted to be told everything is fine.
+    /// Called after every saved check: one soft hello that a beat was felt
+    /// and shared, nothing more.
     func notify(reading: BeatReading) {
-        guard reading.mood.isWorrying else { return }
-
         let content = UNMutableNotificationContent()
-        content.title = "please check on baby 💗"
-        content.body = "the last beat was \(reading.bpm), \(reading.mood.phrase). if anything feels off, call your pediatrician."
-        content.interruptionLevel = .timeSensitive
+        content.title = "a little beat from \(reading.place) 💗"
+        content.body = "\(reading.sender) felt a heartbeat and sent it home just now."
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1.5, repeats: false)
@@ -58,8 +53,8 @@ final class BeatNotifications: NSObject, UNUserNotificationCenterDelegate {
 
         let content = UNMutableNotificationContent()
         content.title = "quiet for a little while 🍼"
-        if let latest {
-            content.body = "no new beat from daycare lately. the last one was \(latest.bpm), \(latest.mood.phrase)."
+        if latest != nil {
+            content.body = "no new beat from daycare lately. ask for one whenever you like."
         } else {
             content.body = "no beat checks from daycare yet today."
         }

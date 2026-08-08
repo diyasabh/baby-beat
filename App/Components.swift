@@ -42,20 +42,6 @@ struct StatChip: View {
     }
 }
 
-/// Little rounded pill for a mood word.
-struct MoodPill: View {
-    var mood: BeatMood
-
-    var body: some View {
-        Text(mood.phrase)
-            .font(Theme.meta(13))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(Capsule().fill(mood.color))
-    }
-}
-
 /// The big pink action button. One style for every primary action.
 struct HeartButton: View {
     var title: String
@@ -99,8 +85,8 @@ struct SquishButtonStyle: ButtonStyle {
     }
 }
 
-/// The big beat card at the top of both dashboards. Same heart, same numbers,
-/// same alert temperature; only the caption differs by who is looking.
+/// The big beat card at the top of both dashboards. The heart carries the
+/// felt rhythm; no numbers and no verdicts, only when and from whom.
 struct BeatHeroCard: View {
     var reading: BeatReading?
     /// Line under the timestamp: who sent it, or who it went to.
@@ -111,22 +97,11 @@ struct BeatHeroCard: View {
     var body: some View {
         CloudCard {
             if let reading {
-                let worrying = reading.mood.isWorrying
                 VStack(spacing: 10) {
-                    PulsingHeart(bpm: reading.bpm, size: 108,
-                                 tint: worrying ? Theme.alert : nil)
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text("\(reading.bpm)")
-                            .font(Theme.number(58))
-                            .foregroundStyle(worrying ? Theme.alert : Theme.ink)
-                        Text("beats a minute")
-                            .font(Theme.meta(14))
-                            .foregroundStyle(Theme.inkSoft)
-                    }
-                    Text(reading.mood.reassurance)
-                        .font(Theme.body(16))
-                        .foregroundStyle(worrying ? Theme.alert : Theme.ink)
-                    MoodPill(mood: reading.mood)
+                    PulsingHeart(bpm: reading.bpm, size: 108)
+                    Text("a little beat, felt and shared")
+                        .font(Theme.body(17))
+                        .foregroundStyle(Theme.ink)
                     VStack(spacing: 2) {
                         HStack(spacing: 4) {
                             Image(systemName: "clock")
@@ -281,26 +256,28 @@ struct SoftButton: View {
     }
 }
 
-/// Mini history: one capsule per reading, height follows bpm, color follows mood.
+/// Mini history: one little heart per check-in. Counts moments, never
+/// measurements.
 struct BeatSparkline: View {
     var readings: [BeatReading]
 
     var body: some View {
         let recent = Array(readings.prefix(12).reversed())
-        HStack(alignment: .bottom, spacing: 6) {
-            ForEach(recent) { r in
-                VStack(spacing: 4) {
-                    Capsule()
-                        .fill(r.mood.color.opacity(0.85))
-                        .frame(width: 14, height: barHeight(bpm: r.bpm))
-                }
+        HStack(spacing: 8) {
+            ForEach(recent) { _ in
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 15))
+                    .foregroundStyle(Theme.heart.opacity(0.85))
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 64, alignment: .bottom)
+        .frame(maxWidth: .infinity, minHeight: 32)
     }
+}
 
-    private func barHeight(bpm: Int) -> CGFloat {
-        let clamped = min(max(bpm, 70), 190)
-        return CGFloat(clamped - 60) / 130 * 64
-    }
+/// Short "5 min ago" style stamp for stat chips.
+func shortAgo(_ date: Date?) -> String {
+    guard let date else { return "~" }
+    let f = RelativeDateTimeFormatter()
+    f.unitsStyle = .short
+    return f.localizedString(for: date, relativeTo: .now)
 }

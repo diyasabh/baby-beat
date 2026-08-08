@@ -92,17 +92,6 @@ struct MeasureView: View {
                 } else {
                     LensGuide()
                 }
-                if let bpm = reader.bpm {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text("\(bpm)")
-                            .font(Theme.number(44))
-                            .foregroundStyle(Theme.ink)
-                            .contentTransition(.numericText())
-                        Text("so far")
-                            .font(Theme.meta(13))
-                            .foregroundStyle(Theme.inkSoft)
-                    }
-                }
                 if reader.isFingerDetected {
                     LiveWave(samples: reader.samples)
                         .frame(height: 56)
@@ -140,22 +129,18 @@ struct MeasureView: View {
     }
 
     private func doneCard(bpm: Int) -> some View {
-        let mood = BeatMood(bpm: bpm)
-        return CloudCard(padding: 24) {
+        // The rhythm is kept for the heart's animation, never shown as a
+        // number: this prototype doesn't earn that kind of trust yet.
+        CloudCard(padding: 24) {
             VStack(spacing: 14) {
                 PulsingHeart(bpm: bpm, size: 104)
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text("\(bpm)")
-                        .font(Theme.number(58))
-                        .foregroundStyle(Theme.ink)
-                    Text("beats a minute")
-                        .font(Theme.meta(14))
-                        .foregroundStyle(Theme.inkSoft)
-                }
-                MoodPill(mood: mood)
-                Text(mood.reassurance)
-                    .font(Theme.body(15))
+                Text("we felt the little beats")
+                    .font(Theme.title(22))
                     .foregroundStyle(Theme.ink)
+                Text("a soft hello from a fingertip, not a medical reading")
+                    .font(Theme.meta(13))
+                    .foregroundStyle(Theme.inkSoft)
+                    .multilineTextAlignment(.center)
                 HeartButton(title: sendTitle, systemImage: "paperplane.fill") {
                     model.add(bpm: bpm)
                     dismiss()

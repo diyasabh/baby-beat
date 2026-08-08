@@ -57,7 +57,7 @@ struct BabyBeatWidget: Widget {
                 .widgetURL(URL(string: "babybeat://check"))
         }
         .configurationDisplayName("Baby Beat")
-        .description("Baby's latest heartbeat from daycare, always close.")
+        .description("A little beat from daycare, always close.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }
@@ -66,18 +66,10 @@ struct BeatWidgetView: View {
     var entry: BeatEntry
     @Environment(\.widgetFamily) private var family
 
-    /// A worrying beat flips the widget's whole temperature: alert sky,
-    /// white heart, white ink. Same primitives, different weather.
-    private var worrying: Bool { entry.reading?.mood.isWorrying == true }
-    /// A caregiver with a parent waiting sees the ask instead of the beat,
-    /// unless the last reading was worrying, which outranks everything.
-    private var asking: BeatRequest? { worrying ? nil : entry.waitingAsk }
-    private var ink: Color { worrying ? .white : Theme.ink }
-    private var inkSoft: Color { worrying ? .white.opacity(0.75) : Theme.inkSoft }
-    /// nil keeps the drawing's own crayon pink; the alert sky needs it white.
-    private var heartTint: Color? { worrying ? .white : nil }
+    /// A caregiver with a parent waiting sees the ask instead of the beat.
+    private var asking: BeatRequest? { entry.waitingAsk }
 
-    /// Small line above the number: where it came from, or where it went.
+    /// Small line above the beat: where it came from, or where it went.
     private var captionLine: String {
         guard let reading = entry.reading else { return "baby beat" }
         return entry.role == .caregiver ? "sent home" : "from \(reading.place)"
@@ -128,28 +120,17 @@ struct BeatWidgetView: View {
 
     private var beatSmallView: some View {
         VStack(spacing: 6) {
-            PulsingHeart(bpm: entry.reading?.bpm ?? 120, size: 64,
-                         animated: false, phase: entry.pulsePhase,
-                         tint: heartTint)
-            if let reading = entry.reading {
-                HStack(alignment: .firstTextBaseline, spacing: 3) {
-                    Text("\(reading.bpm)")
-                        .font(Theme.number(30))
-                        .foregroundStyle(ink)
-                    Text("bpm")
-                        .font(Theme.meta(11))
-                        .foregroundStyle(inkSoft)
-                }
-                if worrying {
-                    Text("check on baby")
-                        .font(Theme.meta(11))
-                        .foregroundStyle(ink)
-                }
+            PulsingHeart(bpm: entry.reading?.bpm ?? 120, size: 72,
+                         animated: false, phase: entry.pulsePhase)
+            if entry.reading != nil {
+                Text("a little beat")
+                    .font(Theme.body(14))
+                    .foregroundStyle(Theme.ink)
                 checkedLine
             } else {
                 Text("no beats yet")
                     .font(Theme.meta(12))
-                    .foregroundStyle(inkSoft)
+                    .foregroundStyle(Theme.inkSoft)
             }
         }
     }
@@ -187,37 +168,31 @@ struct BeatWidgetView: View {
     private var beatMediumView: some View {
         HStack(spacing: 16) {
             PulsingHeart(bpm: entry.reading?.bpm ?? 120, size: 84,
-                         animated: false, phase: entry.pulsePhase,
-                         tint: heartTint)
+                         animated: false, phase: entry.pulsePhase)
             VStack(alignment: .leading, spacing: 5) {
                 Text(captionLine)
                     .font(Theme.meta(12))
-                    .foregroundStyle(inkSoft)
-                if let reading = entry.reading {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text("\(reading.bpm)")
-                            .font(Theme.number(38))
-                            .foregroundStyle(ink)
-                        Text("beats a minute")
-                            .font(Theme.meta(12))
-                            .foregroundStyle(inkSoft)
-                    }
-                    Text(worrying ? "\(reading.mood.phrase), check on baby" : reading.mood.phrase)
+                    .foregroundStyle(Theme.inkSoft)
+                if entry.reading != nil {
+                    Text("a little beat arrived")
+                        .font(Theme.title(19))
+                        .foregroundStyle(Theme.ink)
+                    Text("felt and shared 💗")
                         .font(Theme.meta(12))
-                        .foregroundStyle(worrying ? Theme.alert : .white)
+                        .foregroundStyle(.white)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(Capsule().fill(worrying ? .white : reading.mood.color))
+                        .background(Capsule().fill(Theme.heart))
                     checkedLine
                 } else {
                     Text(emptyTitle)
                         .font(Theme.body(15))
-                        .foregroundStyle(ink)
+                        .foregroundStyle(Theme.ink)
                     Text(entry.role == .caregiver
                          ? "tap to count the first one"
                          : "checks appear the moment they are taken")
                         .font(Theme.meta(12))
-                        .foregroundStyle(inkSoft)
+                        .foregroundStyle(Theme.inkSoft)
                 }
             }
             Spacer(minLength: 0)
@@ -236,11 +211,18 @@ struct BeatWidgetView: View {
                     .font(Theme.title(15))
             }
         } else {
-            VStack(spacing: 0) {
-                Image(systemName: worrying ? "exclamationmark.heart.fill" : "heart.fill")
-                    .font(.system(size: 14))
-                Text(entry.reading.map { "\($0.bpm)" } ?? "~")
-                    .font(Theme.title(18))
+            VStack(spacing: 1) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 15))
+                if let reading = entry.reading {
+                    Text(reading.date, style: .relative)
+                        .font(Theme.meta(10))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                } else {
+                    Text("~")
+                        .font(Theme.title(16))
+                }
             }
         }
     }
@@ -269,17 +251,12 @@ struct BeatWidgetView: View {
     private var beatRectangularView: some View {
         VStack(alignment: .leading, spacing: 1) {
             HStack(spacing: 4) {
-                if worrying {
-                    Image(systemName: "exclamationmark.heart.fill")
-                        .font(.system(size: 11))
-                } else {
-                    BrandIcon(icon: .heartbeat, size: 13)
-                }
+                BrandIcon(icon: .heartbeat, size: 13)
                 Text("baby beat")
                     .font(Theme.body(12))
             }
             if let reading = entry.reading {
-                Text(worrying ? "\(reading.bpm) bpm, check baby" : "\(reading.bpm) bpm, \(reading.mood.word)")
+                Text("a little beat arrived")
                     .font(Theme.title(15))
                 Text(reading.date, style: .relative)
                     .font(Theme.meta(11))
@@ -299,22 +276,21 @@ struct BeatWidgetView: View {
         if let reading = entry.reading {
             (Text("checked ") + Text(reading.date, style: .relative) + Text(" ago"))
                 .font(Theme.meta(10))
-                .foregroundStyle(inkSoft)
+                .foregroundStyle(Theme.inkSoft)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
     }
 
-    /// The same sky as the app, with one thick puff in the corner.
-    /// A worrying beat turns the whole sky alert red.
+    /// The same sky as the app, with one thick puff in the corner. A warm
+    /// butter sky when someone is asking, the everyday baby blue otherwise.
     private var skyBackground: some View {
         ZStack {
-            if worrying || asking != nil {
-                // Alert and asking get their own weather, so they stay
-                // unmistakable against the everyday drawn sky.
-                LinearGradient(colors: skyColors, startPoint: .top, endPoint: .bottom)
+            if asking != nil {
+                LinearGradient(colors: [Theme.butter, Theme.skyBottom],
+                               startPoint: .top, endPoint: .bottom)
                 CloudShape()
-                    .fill(.white.opacity(worrying ? 0.18 : 0.55))
+                    .fill(.white.opacity(0.55))
                     .frame(width: 110, height: 60)
                     .offset(x: 50, y: -52)
             } else {
@@ -323,13 +299,5 @@ struct BeatWidgetView: View {
                     .scaledToFill()
             }
         }
-    }
-
-    /// Three weathers: alert red, a warm butter sky when someone is asking,
-    /// and the everyday baby blue.
-    private var skyColors: [Color] {
-        if worrying { return [Theme.alert, Theme.alertDeep] }
-        if asking != nil { return [Theme.butter, Theme.skyBottom] }
-        return [Theme.skyTop, Theme.skyBottom]
     }
 }

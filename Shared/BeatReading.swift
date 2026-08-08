@@ -26,10 +26,12 @@ struct BeatReading: Codable, Identifiable, Equatable {
     var sender: String { "\(caregiver) at \(place)" }
 }
 
-/// How the beat feels, in baby words. Typical resting range for infants is
-/// roughly 90 to 160 beats per minute, lower while fast asleep. Far outside
-/// that range the whole system shifts into the alert look: same primitives,
-/// red temperature, so the parent can't miss it.
+/// How the beat feels, in baby words.
+///
+/// NOT RENDERED ANYWHERE, on purpose. The capture pipeline is not accurate
+/// enough yet to show bpm or interpret wellness, so the UI shows no numbers,
+/// no mood words, and no alerts (decided 2026-08-08). This type stays only
+/// so stored data and the mapping survive until the pipeline earns it.
 enum BeatMood: String, Codable {
     case sleepy
     case cozy

@@ -6,6 +6,8 @@ A fingertip resting on the lens with the flash on makes the skin flush and fade 
 
 All the visuals were generated using Lovart! Watch our Loom video for more.
 
+**Live site:** [baby-beat.vercel.app](https://baby-beat.vercel.app) — the interactive walkthrough of every flow, served straight from [`presentation/`](presentation/) in this repo.
+
 ## Two apps in one
 
 The first question at launch is *who's holding the phone?*, and the answer decides which half of the app you get.

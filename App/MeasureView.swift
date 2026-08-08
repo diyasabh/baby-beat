@@ -8,9 +8,13 @@ struct MeasureView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var reader = PulseCameraReader()
 
-    private enum Stage { case intro, reading, done(Int) }
+    private enum Stage { case intro, reading, done(Int), wobbly }
     @State private var stage: Stage = .intro
     @State private var beatPop = false
+    @State private var readingStart = Date()
+    /// Patience before admitting a reading came out wobbly.
+    private let patience: TimeInterval = 32
+    private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
@@ -22,6 +26,7 @@ struct MeasureView: View {
                 case .intro: introCard
                 case .reading: readingCard
                 case .done(let bpm): doneCard(bpm: bpm)
+                case .wobbly: wobblyCard
                 }
                 Spacer(minLength: 0)
             }
@@ -31,9 +36,17 @@ struct MeasureView: View {
         .onChange(of: reader.progress) { _, progress in
             // The rolling window trims itself to just under windowSeconds,
             // so progress settles at ~0.99 rather than touching 1 exactly.
-            if case .reading = stage, progress >= 0.98, let bpm = reader.bpm {
+            // A reading only completes once the beats agree with each other;
+            // an unsure rhythm keeps listening instead of guessing.
+            if case .reading = stage, progress >= 0.98, reader.isConfident, let bpm = reader.bpm {
                 reader.stop()
                 withAnimation(Theme.ease) { stage = .done(bpm) }
+            }
+        }
+        .onReceive(ticker) { _ in
+            if case .reading = stage, Date().timeIntervalSince(readingStart) > patience {
+                reader.stop()
+                withAnimation(Theme.ease) { stage = .wobbly }
             }
         }
     }
@@ -120,12 +133,45 @@ struct MeasureView: View {
         }
     }
 
-    /// Hot-and-cold coaching while the fingertip hunts for the heart lens.
+    /// Hot-and-cold coaching while the fingertip hunts for the heart lens,
+    /// then patience coaching while the beats settle into agreement.
     private var guidance: String {
-        if reader.isFingerDetected { return "there it is, hold soft and still" }
+        if reader.isFingerDetected {
+            if reader.progress >= 0.98, !reader.isConfident {
+                return "still listening, hold extra still"
+            }
+            return "there it is, hold soft and still"
+        }
         if reader.warmth > 0.6 { return "so close, a tiny slide more" }
         if reader.warmth > 0.2 { return "getting warmer, keep sliding slowly" }
         return "cover the heart lens, then slide slowly until this fills"
+    }
+
+    private var wobblyCard: some View {
+        CloudCard(padding: 24) {
+            VStack(spacing: 14) {
+                LensGuide()
+                Text("that one came out wobbly")
+                    .font(Theme.title(22))
+                    .foregroundStyle(Theme.ink)
+                Text("the beats didn't agree with each other, so nothing was kept. little fingers wiggle — it happens. soft flat pressure on the heart lens usually does it.")
+                    .font(Theme.meta(13))
+                    .foregroundStyle(Theme.inkSoft)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                HeartButton(title: "try again") {
+                    beginReading()
+                }
+                Button("not now") {
+                    reader.stop()
+                    dismiss()
+                }
+                .font(Theme.meta(14))
+                .foregroundStyle(Theme.inkSoft)
+                .buttonStyle(SquishButtonStyle())
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
 
     private func doneCard(bpm: Int) -> some View {
@@ -175,6 +221,7 @@ struct MeasureView: View {
     }
 
     private func beginReading() {
+        readingStart = Date()
         #if targetEnvironment(simulator)
         withAnimation(Theme.ease) { stage = .reading }
         reader.start()
@@ -182,6 +229,7 @@ struct MeasureView: View {
         AVCaptureDevice.requestAccess(for: .video) { granted in
             DispatchQueue.main.async {
                 guard granted else { return }
+                readingStart = Date()
                 withAnimation(Theme.ease) { stage = .reading }
                 reader.start()
             }

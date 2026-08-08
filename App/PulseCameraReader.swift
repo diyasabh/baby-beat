@@ -14,6 +14,10 @@ final class PulseCameraReader: NSObject, ObservableObject {
     @Published var isFingerDetected = false
     @Published var samples: [Double] = []   // recent normalized signal for the live wave
     @Published var progress: Double = 0      // 0...1 over the measurement window
+    /// 0...1 hot-and-cold signal for finding the right lens on phones with
+    /// several. Only one lens is ever sampled (the main wide camera); this
+    /// rises as a sliding fingertip gets closer to it.
+    @Published var warmth: Double = 0
 
     private let session = AVCaptureSession()
     private let queue = DispatchQueue(label: "babybeat.camera")
@@ -104,9 +108,39 @@ final class PulseCameraReader: NSObject, ObservableObject {
 
     // MARK: Shared pipeline
 
+    private var fingerLatched = false
+    private var fingerSince: Double?
+    private var exposureLocked = false
+    private var warmthSmoothed: Double = 0
+
     private func process(brightness: Double, redRatio: Double, at time: Double) {
         // Finger present when the lens is mostly red and lit by the torch.
-        let fingerOn = redRatio > 0.55 && brightness > 0.2
+        // Latched with hysteresis so brushing the edge of the lens doesn't
+        // flicker between found and lost.
+        if !fingerLatched, redRatio > 0.55, brightness > 0.2 {
+            fingerLatched = true
+            fingerSince = time
+        } else if fingerLatched, redRatio < 0.47 || brightness < 0.12 {
+            fingerLatched = false
+            fingerSince = nil
+            if exposureLocked { exposureLocked = false; setExposureLocked(false) }
+        }
+        let fingerOn = fingerLatched
+
+        // Once the fingertip has settled, freeze exposure so auto-exposure
+        // stops chasing (and flattening) the pulse shimmer.
+        if fingerOn, !exposureLocked, let since = fingerSince, time - since > 0.8 {
+            exposureLocked = true
+            setExposureLocked(true)
+        }
+
+        // The hot-and-cold signal: a bare scene sits near a third red, a lit
+        // fingertip climbs well past half. Smoothed so it glides, not jumps.
+        let closeness = min(max((redRatio - 0.36) / 0.22, 0), 1)
+        let lit = min(brightness / 0.15, 1)
+        warmthSmoothed += 0.25 * (closeness * lit - warmthSmoothed)
+        let warmthNow = fingerOn ? 1 : warmthSmoothed
+
         brightnessWindow.append(brightness)
         timestamps.append(time)
 
@@ -122,6 +156,7 @@ final class PulseCameraReader: NSObject, ObservableObject {
 
         DispatchQueue.main.async {
             self.isFingerDetected = fingerOn
+            self.warmth = warmthNow
             if fingerOn {
                 self.samples = Array(normalized.suffix(120))
                 self.progress = min(span / self.windowSeconds, 1)
@@ -132,6 +167,21 @@ final class PulseCameraReader: NSObject, ObservableObject {
                 self.bpm = nil
             }
         }
+    }
+
+    /// Freezes or releases exposure and white balance. Locked while a
+    /// fingertip rests on the lens; auto again once it lifts.
+    private func setExposureLocked(_ locked: Bool) {
+        guard let d = device else { return }
+        try? d.lockForConfiguration()
+        if locked {
+            if d.isExposureModeSupported(.locked) { d.exposureMode = .locked }
+            if d.isWhiteBalanceModeSupported(.locked) { d.whiteBalanceMode = .locked }
+        } else {
+            if d.isExposureModeSupported(.continuousAutoExposure) { d.exposureMode = .continuousAutoExposure }
+            if d.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) { d.whiteBalanceMode = .continuousAutoWhiteBalance }
+        }
+        d.unlockForConfiguration()
     }
 
     private func normalize(_ values: [Double]) -> [Double] {
